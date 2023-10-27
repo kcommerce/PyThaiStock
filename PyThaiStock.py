@@ -3,6 +3,7 @@ from PyQt5.QtCore import Qt, QUrl
 from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,QLineEdit, QPushButton, QMessageBox,QLabel,QTabWidget
 from PyQt5.QtWebEngineWidgets import QWebEngineView
 import csv
+from ConfigEditor import ConfigEditor
 
 class UrlButton(QPushButton):
     def __init__(self, text, url,text_input,tab, parent=None):
@@ -58,7 +59,10 @@ class WebPageOpener(QMainWindow):
         self.tab.setTabsClosable(True)
 
 
-        
+        # Create Config button
+        self.cbutton = QPushButton("Config")
+        self.cbutton.clicked.connect(self.show_config)
+        self.menu_layout.addWidget(self.cbutton)
         # Create a button from config file
         self.create_menu()
 
@@ -73,8 +77,17 @@ class WebPageOpener(QMainWindow):
                 #button = UrlButton2(text,url)
                 self.menu_layout.addWidget(button)
 
+    def show_config(self):
+        #self.show_message_box("Hello, World")
+        window = ConfigEditor()
+        index = self.tab.addTab(window, "Config Editor")
+        self.tab.setCurrentIndex(index)
 
-
+    def show_message_box(self,message):
+        msg_box = QMessageBox()
+        msg_box.setWindowTitle("Message")
+        msg_box.setText(message)
+        msg_box.exec_()
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
