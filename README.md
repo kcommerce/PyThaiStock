@@ -1,12 +1,16 @@
 # PyThaiStock
-A simple python program to access data from SiamChart and SET Thailand
+- A simple python program to access data from SiamChart and SET Thailand
+- <img src="images/PyThaiStock v0.1.png" alt="PyThaiStock" width="50%" height="50%">
+- Download here:  [Release ](https://github.com/kcommerce/PyThaiStock/releases/)  
+# Credits:
+- SiamChart: www.siamchart.com
+- SET Thailand: www.set.or.th
+
 # Prerequisites
 - MacOS
 - Python 3+
 
-# Credits:
-- SiamChart: www.siamchart.com
-- SET Thailand: www.set.or.th
+
   
 ### Build executable on MacOS
 - Install pyinstaller
