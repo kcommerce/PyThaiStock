@@ -48,6 +48,7 @@ class WebPageOpener(QMainWindow):
 
 
         self.tab = QTabWidget(self)
+        self.tab.tabCloseRequested.connect(self.tab.removeTab)
         self.layout.addWidget(self.tab)
 
 
