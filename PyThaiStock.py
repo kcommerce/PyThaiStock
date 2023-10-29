@@ -131,7 +131,8 @@ Profile,https://www.set.or.th/th/market/product/stock/quote/[SYMBOL]/company-pro
 """
         self.create_menu()
 
-
+        self.text_status = QLabel("Status: Up")
+        self.layout.addWidget(self.text_status)
 
     
     def read_default(self):
@@ -154,6 +155,7 @@ Profile,https://www.set.or.th/th/market/product/stock/quote/[SYMBOL]/company-pro
                 self.config_file = config_file
             except:
                 self.show_message_box("Cannot create and read from "+config_file)  
+
     def read_csv(self,config_file):
         with open(config_file, 'r') as csv_file:
             csv_reader = csv.reader(csv_file)
@@ -169,10 +171,19 @@ Profile,https://www.set.or.th/th/market/product/stock/quote/[SYMBOL]/company-pro
         try:
 
             config_file = self.config_file
-            self.read_csv(config_file)
-
+            config_file2 = os.path.join(tempfile.gettempdir(),self.config_file)
+            if os.path.exists(config_file):
+                self.read_csv(config_file)
+                self.text_status.setText("Load config from :"+config_file)
+            elif (os.path.exists(config_file2)):
+                self.read_csv(config_file2)
+                self.config_file  = config_file2
+                self.text_status.setText("Load config from :"+config_file2)
+            else:
+                self.read_default()
+                self.text_status.setText("Load config from default")
         except:
-            self.show_message_box("Error: Missing url.cfg: Open default config")
+            self.show_message_box("Error: reading url.cfg")
             self.read_default()
 
     def show_config(self):
