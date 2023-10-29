@@ -3,7 +3,6 @@ from PyQt5.QtCore import Qt, QUrl
 from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,QLineEdit, QPushButton, QMessageBox,QLabel,QTabWidget
 from PyQt5.QtWebEngineWidgets import QWebEngineView
 import csv
-from ConfigEditor import ConfigEditor
 
 
 class ConfigEditor(QMainWindow):
@@ -62,7 +61,7 @@ class ConfigEditor(QMainWindow):
         msg_box.setText(message)
         msg_box.exec_()
 
-        
+
 class UrlButton(QPushButton):
     def __init__(self, text, url,text_input,tab, parent=None):
         super().__init__(text, parent)
