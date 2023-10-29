@@ -1,17 +1,17 @@
 import sys
 from PyQt5.QtCore import Qt, QUrl
-from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,QLineEdit, QPushButton, QMessageBox,QLabel,QTabWidget
+from PyQt5.QtWidgets import QApplication, QFileDialog,QMainWindow, QTextEdit,QWidget, QVBoxLayout, QHBoxLayout,QLineEdit, QPushButton, QMessageBox,QLabel,QTabWidget
 from PyQt5.QtWebEngineWidgets import QWebEngineView
-import csv
+import csv,os,tempfile
 
 
 class ConfigEditor(QMainWindow):
-    def __init__(self):
+    def __init__(self,config_file):
         super().__init__()
 
-        self.init_ui()
+        self.init_ui(config_file)
 
-    def init_ui(self):
+    def init_ui(self,config_file):
         self.central_widget = QWidget(self)
         self.layout = QVBoxLayout(self.central_widget)
 
@@ -28,7 +28,7 @@ class ConfigEditor(QMainWindow):
         self.save_button.setEnabled(False)
 
         self.setCentralWidget(self.central_widget)
-        self.read_config("url.cfg")
+        self.read_config(config_file)
 
     def open_config_file(self):
         options = QFileDialog.Options()
@@ -54,7 +54,7 @@ class ConfigEditor(QMainWindow):
             with open(self.current_file, "w") as file:
                 file.write(config_content)
                 self.save_button.setEnabled(True)
-                self.show_message_box("File saved successfully.")
+                self.show_message_box("File saved successfully:"+self.current_file)
     def show_message_box(self,message):
         msg_box = QMessageBox()
         msg_box.setWindowTitle("Message")
@@ -122,6 +122,7 @@ class WebPageOpener(QMainWindow):
         self.menu_layout.addWidget(self.cbutton)
         # Create a button from config file
         self.config_file="url.cfg"
+
         self.default_config="""Menu-Name,URL-with-[SYMBOL]
 SiamChart,http://siamchart.com/stock-chart/[SYMBOL]
 Finance,https://www.set.or.th/th/market/product/stock/quote/[SYMBOL]/financial-statement/company-highlights
@@ -134,11 +135,25 @@ Profile,https://www.set.or.th/th/market/product/stock/quote/[SYMBOL]/company-pro
 
     
     def read_default(self):
-        f = open(self.config_file, "w")
-        f.write(self.default_config)
-        f.close()
-        self.read_csv(self.config_file)      
-
+        config_file = self.config_file
+        try:
+            f = open(config_file, "w")
+            f.write(self.default_config)
+            f.close()
+            self.read_csv(config_file)    
+        except:
+            config_file = os.path.join(tempfile.gettempdir(),self.config_file)
+            self.show_message_box("Cannot create and read url.cfg from Home directory")  
+            self.show_message_box("Try to create file from:"+config_file)
+            try:
+                f = open(config_file, "w")
+                f.write(self.default_config)
+                f.close()
+                self.read_csv(config_file)  
+                # update config file new location
+                self.config_file = config_file
+            except:
+                self.show_message_box("Cannot create and read from "+config_file)  
     def read_csv(self,config_file):
         with open(config_file, 'r') as csv_file:
             csv_reader = csv.reader(csv_file)
@@ -162,7 +177,7 @@ Profile,https://www.set.or.th/th/market/product/stock/quote/[SYMBOL]/company-pro
 
     def show_config(self):
         #self.show_message_box("Hello, World")
-        window = ConfigEditor()
+        window = ConfigEditor(self.config_file)
         index = self.tab.addTab(window, "Config Editor")
         self.tab.setCurrentIndex(index)
 
