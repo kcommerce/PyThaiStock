@@ -5,6 +5,64 @@ from PyQt5.QtWebEngineWidgets import QWebEngineView
 import csv
 from ConfigEditor import ConfigEditor
 
+
+class ConfigEditor(QMainWindow):
+    def __init__(self):
+        super().__init__()
+
+        self.init_ui()
+
+    def init_ui(self):
+        self.central_widget = QWidget(self)
+        self.layout = QVBoxLayout(self.central_widget)
+
+        self.text_edit = QTextEdit()
+        self.layout.addWidget(self.text_edit)
+
+        self.load_button = QPushButton("Open Config File")
+        self.load_button.clicked.connect(self.open_config_file)
+        self.layout.addWidget(self.load_button)
+
+        self.save_button = QPushButton("Save")
+        self.save_button.clicked.connect(self.save_config_file)
+        self.layout.addWidget(self.save_button)
+        self.save_button.setEnabled(False)
+
+        self.setCentralWidget(self.central_widget)
+        self.read_config("url.cfg")
+
+    def open_config_file(self):
+        options = QFileDialog.Options()
+        options |= QFileDialog.ReadOnly
+
+        file_path, _ = QFileDialog.getOpenFileName(self, "Open Config File", "", "Config Files (*.cfg);;All Files (*)", options=options)
+
+        self.read_config(file_path)
+
+    def read_config(self,file_path):
+        if file_path:
+            with open(file_path, "r") as file:
+                config_content = file.read()
+                self.text_edit.setPlainText(config_content)
+                self.current_file = file_path
+                self.save_button.setEnabled(True)
+        else:
+            self.show_message_box("Error: Cannot read file:"+file_path)
+
+    def save_config_file(self):
+        if hasattr(self, 'current_file'):
+            config_content = self.text_edit.toPlainText()
+            with open(self.current_file, "w") as file:
+                file.write(config_content)
+                self.save_button.setEnabled(True)
+                self.show_message_box("File saved successfully.")
+    def show_message_box(self,message):
+        msg_box = QMessageBox()
+        msg_box.setWindowTitle("Message")
+        msg_box.setText(message)
+        msg_box.exec_()
+
+        
 class UrlButton(QPushButton):
     def __init__(self, text, url,text_input,tab, parent=None):
         super().__init__(text, parent)
@@ -24,7 +82,7 @@ class UrlButton(QPushButton):
           
 
 class WebPageOpener(QMainWindow):
-    buttons={}
+
     def __init__(self):
         super().__init__()
 
@@ -64,10 +122,25 @@ class WebPageOpener(QMainWindow):
         self.cbutton.clicked.connect(self.show_config)
         self.menu_layout.addWidget(self.cbutton)
         # Create a button from config file
+        self.config_file="url.cfg"
+        self.default_config="""Menu-Name,URL-with-[SYMBOL]
+SiamChart,http://siamchart.com/stock-chart/[SYMBOL]
+Finance,https://www.set.or.th/th/market/product/stock/quote/[SYMBOL]/financial-statement/company-highlights
+News,https://www.set.or.th/th/market/product/stock/quote/[SYMBOL]/news
+Profile,https://www.set.or.th/th/market/product/stock/quote/[SYMBOL]/company-profile/information
+"""
         self.create_menu()
 
-    def create_menu(self):
-        config_file = "url.cfg"
+
+
+    
+    def read_default(self):
+        f = open(self.config_file, "w")
+        f.write(self.default_config)
+        f.close()
+        self.read_csv(self.config_file)      
+
+    def read_csv(self,config_file):
         with open(config_file, 'r') as csv_file:
             csv_reader = csv.reader(csv_file)
             next(csv_reader)  # Skip the header row
@@ -75,7 +148,18 @@ class WebPageOpener(QMainWindow):
                 text, url = row
                 button = UrlButton(text,url,self.text_input,self.tab)
                 #button = UrlButton2(text,url)
-                self.menu_layout.addWidget(button)
+                self.menu_layout.addWidget(button)   
+
+    def create_menu(self):
+
+        try:
+
+            config_file = self.config_file
+            self.read_csv(config_file)
+
+        except:
+            self.show_message_box("Error: Missing url.cfg: Open default config")
+            self.read_default()
 
     def show_config(self):
         #self.show_message_box("Hello, World")
