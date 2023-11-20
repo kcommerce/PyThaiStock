@@ -125,9 +125,11 @@ class WebPageOpener(QMainWindow):
 
         self.default_config="""Menu-Name,URL-with-[SYMBOL]
 SiamChart,http://siamchart.com/stock-chart/[SYMBOL]
+Price,https://www.set.or.th/th/market/product/stock/quote/[SYMBOL]/price
 Finance,https://www.set.or.th/th/market/product/stock/quote/[SYMBOL]/financial-statement/company-highlights
 News,https://www.set.or.th/th/market/product/stock/quote/[SYMBOL]/news
 Profile,https://www.set.or.th/th/market/product/stock/quote/[SYMBOL]/company-profile/information
+TradingView,https://www.tradingview.com/chart/?symbol=SET%3A[SYMBOL]
 """
         self.create_menu()
 
@@ -172,6 +174,7 @@ Profile,https://www.set.or.th/th/market/product/stock/quote/[SYMBOL]/company-pro
 
             config_file = self.config_file
             config_file2 = os.path.join(tempfile.gettempdir(),self.config_file)
+            '''
             if os.path.exists(config_file):
                 self.read_csv(config_file)
                 self.text_status.setText("Load config from :"+config_file)
@@ -182,6 +185,10 @@ Profile,https://www.set.or.th/th/market/product/stock/quote/[SYMBOL]/company-pro
             else:
                 self.read_default()
                 self.text_status.setText("Load config from default")
+            '''
+            self.read_default()
+            self.text_status.setText("Load config from default")           
+
         except:
             self.show_message_box("Error: reading url.cfg")
             self.read_default()
